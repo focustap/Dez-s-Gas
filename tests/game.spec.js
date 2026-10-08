@@ -102,3 +102,28 @@ test('mobile pixel-art game renders, navigation works and no console errors',asy
  expect(errors).toEqual([]);
  await ctx.close();
 });
+test('an undercover sting ends the shift, while refusing avoids arrest',async({page})=>{
+ await launch(page);
+ await page.evaluate(()=>{
+  const D=window.DezDebug,s=D.state;
+  s.customer.type='deal';s.customer.request=['moon'];s.customer.faction='civilian';
+  s.customer.officerId='quinn';s.customer.portrait={skin:1,hair:2,shirt:5,style:'plain'};
+  s.underground.moon=2;s.room='backroom';D.refresh();
+ });
+ const initial=await page.evaluate(()=>DezDebug.state.cash);
+ await dragPixel(page,[82,96],[389,288]);
+ const record=await page.evaluate(()=>({arrests:DezDebug.state.arrests,completed:DezDebug.state.completed,busted:DezDebug.state.busted,penalties:DezDebug.state.dayStats.penalties,cash:DezDebug.state.cash}));
+ expect(record.arrests).toBe(1);expect(record.completed).toBe(true);expect(record.busted).toBe(true);
+ expect(record.cash).toBeLessThan(initial);
+ await expect(page.locator('.modal-header h2')).toContainText('BUSTED');
+ await page.locator('[data-do="nextday"]').click();
+ expect(await page.evaluate(()=>DezDebug.state.completed)).toBe(false);
+ expect(await page.evaluate(()=>DezDebug.state.busted)).toBe(false);
+ await page.evaluate(()=>{
+  const D=window.DezDebug,s=D.state;
+  s.customer.type='deal';s.customer.officerId='quinn';s.customer.faction='civilian';s.customer.request=['moon'];
+  s.room='backroom';D.refresh();
+ });
+ await page.locator('[data-action="refuse"]').click();
+ expect(await page.evaluate(()=>DezDebug.state.arrests)).toBe(1);
+});
