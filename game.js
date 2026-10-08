@@ -382,7 +382,10 @@ function beginPointer(ev){
    if(ui.selected){doDrop(ui.selected,h);ui.selected=null}
  }
 }
-function movePointer(ev){if(!ui.fingerDown&&!ui.drag)return;ui.pointer=screenPos(ev)}
+function movePointer(ev){
+ ui.pointer=screenPos(ev);
+ ui.hover=Pixel.hotspots().filter(h=>within(ui.pointer,h)).slice(-1)[0]||null;
+}
 function endPointer(ev){
  const p=screenPos(ev),drag=ui.drag;ui.pointer=p;ui.drag=null;ui.fingerDown=false;ui.gasFilling=false;
  if(!drag)return;
@@ -432,6 +435,7 @@ canvas.addEventListener("pointerdown",beginPointer);
 canvas.addEventListener("pointermove",movePointer);
 canvas.addEventListener("pointerup",endPointer);
 canvas.addEventListener("pointercancel",pointerCancel);
+canvas.addEventListener("pointerleave",()=>{ui.hover=null;if(!ui.fingerDown)ui.pointer={x:-100,y:-100}});
 window.addEventListener("blur",pointerCancel);
 $("#mute").addEventListener("click",()=>{state.mute=!state.mute;refresh()});
 holdButton();
