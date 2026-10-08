@@ -94,7 +94,7 @@ function store(c,S,ui,t){
  // register
  frame(c,94,270,123,74,"#495e6d","#9badb7");
  frame(c,102,280,106,39,"#243c4d","#6b8c9e");
- r(c,110,287,90,24,"#a9d9bd");text(c,"$"+(ui.total||0),155,285,24,"#3e675f","center");
+ r(c,110,287,90,24,"#a9d9bd");text(c,"$"+(S.scanned||[]).reduce((n,id)=>n+(D.goods.find(g=>g.id===id)?.price||0),0).toFixed(0),155,285,24,"#3e675f","center");
  for(let i=0;i<10;i++)r(c,104+(i%5)*19,326+Math.floor(i/5)*8,13,3,"#b6c3c0");
  // scanner
  frame(c,252,261,142,83,"#293948","#8192a4");
@@ -210,6 +210,19 @@ function draw(c,S,ui,t=0){
  original.draw(c,S,ui,t); // retains exact tested hotspots
  c.save();c.imageSmoothingEnabled=false;
  (scenes[S.room]||store)(c,S,ui,t);
+ if(ui.hover&&!ui.drag){
+  const h=ui.hover;
+  if(h.kind==="item"||h.kind==="parcel"||h.kind==="officer"||h.kind==="gang"||h.kind==="drop"){
+   c.save();c.strokeStyle="#f9db9e";c.lineWidth=2;c.setLineDash([5,5]);
+   c.strokeRect(h.x+2,h.y+2,h.w-4,h.h-4);c.setLineDash([]);
+   const labelText=h.label||h.id;
+   const w=Math.min(295,Math.max(83,labelText.length*8+24));
+   const xx=Math.max(5,Math.min(635-w,h.x+h.w/2-w/2));
+   const yy=h.y>60?h.y-26:h.y+h.h+4;
+   r(c,xx,yy,w,22,"#122536");r(c,xx,yy,w,3,K.gold);
+   text(c,labelText,xx+w/2,yy+5,15,K.pale,"center");c.restore();
+  }
+ }
  if(ui.drag){const d=ui.drag,m=ui.pointer||{x:0,y:0};glow(c,m.x,m.y,54,K.gold,.13);
   if(d.kind==="item"||d.kind==="parcel")product(c,d.id,m.x-20,m.y-17,1.15);
   if(d.id==="nozzle"){r(c,m.x-10,m.y-20,18,37,"#374250");r(c,m.x+3,m.y-20,28,9,"#c1ccce")}
