@@ -127,3 +127,27 @@ test('an undercover sting ends the shift, while refusing avoids arrest',async({p
  await page.locator('[data-action="refuse"]').click();
  expect(await page.evaluate(()=>DezDebug.state.arrests)).toBe(1);
 });
+
+test('visual v2 renders detailed scenes and tooltips while keeping all interactive hotspots',async({page})=>{
+ const errors=[];page.on('pageerror',e=>errors.push(e.message));
+ await launch(page);
+ const fs=require('fs');fs.mkdirSync('test-results/visual-v2',{recursive:true});
+ const uniqueScenes=[];
+ for(const room of ['store','pumps','backroom','office']){
+   await page.locator('[data-room="'+room+'"]').click();
+   await page.screenshot({path:'test-results/visual-v2/'+room+'.png',fullPage:true});
+   const info=await page.evaluate(()=>{
+     const c=document.querySelector('#scene'),data=c.getContext('2d').getImageData(0,0,640,380).data;
+     const colorAt=(x,y)=>{const i=(y*640+x)*4;return Array.from(data.slice(i,i+3)).join(',')};
+     return {corners:[colorAt(10,10),colorAt(320,180),colorAt(555,300)],hotspots:window.DezPixel.hotspots().length};
+   });
+   expect(info.hotspots).toBeGreaterThanOrEqual(room==='pumps'?1:3);
+   uniqueScenes.push(info.corners.join('|'));
+ }
+ expect(new Set(uniqueScenes).size).toBe(4);
+ await page.locator('[data-room="store"]').click();
+ const canvas=page.locator('#scene'),bounds=await canvas.boundingBox();
+ await page.mouse.move(bounds.x+bounds.width*70/640,bounds.y+bounds.height*93/380);
+ await expect.poll(()=>page.evaluate(()=>window.DezDebug.ui.hover?.id)).toBe('candy');
+ expect(errors).toEqual([]);
+});
