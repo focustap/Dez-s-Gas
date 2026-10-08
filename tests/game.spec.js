@@ -47,9 +47,9 @@ test('physically connects gas nozzle and pumps fuel',async({page})=>{
  expect(await page.evaluate(()=>window.DezDebug.ui.gasConnected)).toBe(true);
  const fill=page.locator('[data-action="fill"]');
  await expect(fill).toBeEnabled();
- await fill.hover();await page.mouse.down();await page.waitForTimeout(450);await page.mouse.up();
+ await fill.hover();await page.mouse.down();await page.waitForTimeout(6200);await page.mouse.up();
  expect(await page.evaluate(()=>window.DezDebug.ui.fuelProgress)).toBeGreaterThan(0);
- await page.evaluate(()=>window.DezDebug.ui.fuelProgress=100);
+ await expect(page.locator('[data-action="fuelpay"]')).toBeEnabled();
  await page.locator('[data-action="fuelpay"]').click();
  expect(await page.evaluate(()=>window.DezDebug.state.customerDone)).toBe(1);
  expect(await page.evaluate(()=>window.DezDebug.state.fuel)).toBe(72);
@@ -73,7 +73,7 @@ test('fictional backroom handoff affects heat and factions; officers have portra
  await page.screenshot({path:'test-results/office-desktop.png',fullPage:true});
  await page.locator('[data-action="dossier"]').click();
  await expect(page.locator('.dossier-card canvas')).toHaveCount(3);
- await page.locator('[data-do="close"]').click();
+ await page.locator('[data-do="close"]').last().click();
 });
 test('upgrades and restocks spend cash and persist after reload',async({page})=>{
  await launch(page);
@@ -82,7 +82,7 @@ test('upgrades and restocks spend cash and persist after reload',async({page})=>
  await expect(page.locator('.upgrade-card')).toHaveCount(12);
  await page.locator('[data-buy="desk"]').click();
  expect(await page.evaluate(()=>DezDebug.state.owned.includes('desk'))).toBe(true);
- await page.locator('[data-do="close"]').click();
+ await page.locator('[data-do="close"]').last().click();
  await page.locator('[data-action="supplies"]').click();
  await page.locator('[data-restock="legal:gum"]').click();
  expect(await page.evaluate(()=>DezDebug.state.legal.gum)).toBe(16);
