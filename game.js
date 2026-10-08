@@ -235,12 +235,18 @@ function handoff(id){
  state.underground[id]--;
  const rival=c.faction==="iron",cop=!!c.officerId;
  if(cop){
+  // A caught private transaction ends the shift. Officer dossiers and the
+  // choice to refuse a request are real gameplay, not decorative flavor.
   const fine=state.owned.includes("cashbox")?55:95;
   state.cash=Math.max(0,state.cash-fine);
   state.heat=clamp(state.heat+28,0,100);
-  state.rep=clamp(state.rep-9,0,100);
+  state.rep=clamp(state.rep-13,0,100);
   state.arrests++;state.dayStats.penalties+=fine;state.dayStats.inspections++;
-  completeCustomer("STING! A known officer recorded the handoff. Lost "+price(fine)+".",0,-4,0,"underground");
+  state.busted=true;state.completed=true;
+  state.customer=null;state.scanned=[];
+  ui.fuelProgress=0;ui.gasFilling=false;ui.gasConnected=false;
+  log("BUSTED! An undercover officer ended the shift. Penalty: "+price(fine)+".");
+  chime("bad");refresh();report();
   return;
  }
  if(rival){
@@ -327,7 +333,7 @@ function dossier(type){
 }
 function report(){
  const stats=state.dayStats,avg=stats.scores.length?Math.round(stats.scores.reduce((a,b)=>a+b,0)/stats.scores.length):100;
- openModal(modalHeader("DEZ'S GAS · ACCOUNTING","DAY "+state.day+" REPORT",state.completed?"Time to roll the doors down and count the cash.":"Live shift numbers so far.")+
+ openModal(modalHeader("DEZ'S GAS · ACCOUNTING",state.busted?"BUSTED · SHIFT OVER":"DAY "+state.day+" REPORT",state.busted?"An undercover sting ended your night early. Next time, check the portrait files and choose carefully.":state.completed?"Time to roll the doors down and count the cash.":"Live shift numbers so far.")+
  '<div class="report-grid">'+[
  ["STORE",price(stats.sales)],["GAS",price(stats.fuel)],["PRIVATE",price(stats.underground)],["PENALTIES",price(stats.penalties)],["CUSTOMERS",stats.served],["HEAT",Math.round(state.heat)+"%"],["WALLET",price(state.cash)],["REP",Math.round(state.rep)]
  ].map(x=>'<div class="report-cell"><small>'+x[0]+'</small><strong>'+x[1]+'</strong></div>').join("")+'</div>'+
@@ -336,7 +342,7 @@ function report(){
 }
 function nextDay(){
  if(!state.completed)return;
- state.day++;state.completed=false;
+ state.day++;state.completed=false;state.busted=false;
  state.heat=clamp(state.heat-13,0,100);
  state.rep=clamp(state.rep+1,0,100);
  state.customer=null;state.customerDone=0;state.scanned=[];state.news=Data.sample(Data.news);state.weather=Data.sample(Data.weather);
