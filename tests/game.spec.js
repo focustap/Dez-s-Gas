@@ -2,7 +2,7 @@ const {test,expect}=require('@playwright/test');
 async function launch(page){
   await page.goto('/');
   await expect(page.locator('#scene')).toBeVisible();
-  const welcome=page.locator('[data-do="close"]');
+  const welcome=page.locator('[data-do="close"]').last();
   if(await welcome.isVisible())await welcome.click();
   await expect(page.locator('#modal')).toBeHidden();
 }
