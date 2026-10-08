@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#161b26"><meta name="description" content="Dez's Gas: a pixel-art convenience store, gas pump, and underworld strategy game.">
+<title>DEZ'S GAS — LAST STOP ON ROUTE 6</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div id="shell">
+ <header class="game-head">
+   <a href="./" class="logo" title="Dez's Gas">⛽ <span>DEZ'S <b>GAS</b></span><small>ROUTE 6 · OPEN 24/7*</small></a>
+   <div class="day-badge"><span id="day">DAY 01</span><small id="dayphase">NIGHT SHIFT</small></div>
+   <div class="hud"><div><small>CASH</small><b id="cash">$0</b></div><div><small>HEAT</small><b id="heat">0%</b></div><div><small>REP</small><b id="rep">★ 20</b></div><div><small>SHIFT</small><b id="shift">0/6</b></div></div>
+   <button id="mute" class="small-btn" title="Sound" aria-label="Toggle sound">♫</button>
+ </header>
+ <nav class="tabs" aria-label="Station rooms">
+  <button class="tab active" data-room="store">▤ <span>STORE</span></button>
+  <button class="tab" data-room="pumps">⛽ <span>PUMPS</span></button>
+  <button class="tab" data-room="backroom">▣ <span>BACKROOM</span></button>
+  <button class="tab" data-room="office">☰ <span>OFFICE</span></button>
+ </nav>
+ <main class="layout">
+  <aside class="side side-left">
+   <div class="side-title"><span>SHIFT BOARD</span><b>★</b></div>
+   <div id="customerCard" class="customer-card"></div>
+   <div class="section-title">TO DO</div>
+   <div id="tasks" class="task-list"></div>
+   <div class="section-title">TONIGHT'S NEWS</div>
+   <div id="bulletin" class="bulletin"></div>
+  </aside>
+  <section class="play-column">
+   <div class="screen-border">
+    <div class="screen-top"><span id="roomTitle">DEZ'S · STORE COUNTER</span><span id="weatherText">☂ LIGHT RAIN</span></div>
+    <canvas id="scene" width="640" height="380" aria-label="Pixel-art interactive gas station game" tabindex="0"></canvas>
+    <div class="screen-bottom"><span id="sceneHint">DRAG ITEMS TO THE SCANNER · TAP OBJECTS TO INTERACT</span><span class="live-light">● LIVE</span></div>
+   </div>
+   <div class="workflow"><div id="workTitle">COUNTER</div><div id="workInfo"></div><div id="workActions" class="work-actions"></div></div>
+  </section>
+  <aside class="side side-right">
+   <div class="side-title"><span>STATION LEDGER</span><b>⌁</b></div>
+   <div id="stockPanel"></div>
+   <div class="section-title">FACTION STANDING</div>
+   <div id="factions"></div>
+   <div class="section-title">SHIFT PROGRESS</div>
+   <div class="progress-bar"><div id="progressFill"></div></div>
+   <p id="progressLabel" class="muted"></p>
+   <div id="journal" class="journal"></div>
+  </aside>
+ </main>
+ <footer class="game-footer"><span>DEZ'S GAS · BUILD <span id="buildTag">001</span> · ALL CHARACTERS & FACTIONS ARE FICTIONAL</span><span>PIXELS, PUMPS & POOR DECISIONS™</span></footer>
+</div>
+<div id="toast" class="toast" role="status" aria-live="polite"></div>
+<div id="modal" class="modal" hidden></div>
+<script src="data.js"></script><script src="pixel.js"></script><script src="game.js"></script>
+</body>
+</html>

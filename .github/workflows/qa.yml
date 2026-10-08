@@ -1,0 +1,32 @@
+name: Dez's Gas Gameplay QA
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+jobs:
+  chromium:
+    runs-on: ubuntu-latest
+    timeout-minutes: 16
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: npm install
+      - run: npx playwright install --with-deps chromium
+      - name: Serve game locally
+        run: |
+          python3 -m http.server 4173 --bind 127.0.0.1 >/tmp/dez-server.log 2>&1 &
+          sleep 2
+      - name: Run pixel game browser tests
+        run: npm test
+      - name: Upload screenshots and test reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: dez-gas-qa
+          path: |
+            test-results/
+            playwright-report/
+          retention-days: 7
